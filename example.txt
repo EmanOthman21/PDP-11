@@ -1,9 +1,9 @@
-;this code doesn’t do anything significant, it is just an example
+;this code doesn’t do anything significant, it is just an example 0
 MOV N, R0 ; R0 = 7 address 0
 XOR R1, R1 ; R1 = 0 address 2
 MOV #20, R3 ; R3 = 20 address 3
-; memory is word addressable, so there isno
-; problem in having odd addresses, why?
+; memory is word addressable, so there isno 3
+; problem in having odd addresses, why? 3
 Label3: ; address 5
 MOV -(R3), M ; M = 5 , R3= 19 address 5
 DEC R0 ; R0 = 6 address 7
@@ -20,3 +20,4 @@ HLT ; address 17
 Define N 7 ; address 18
 Define M 5 ; address 19
 Define arr 7 8 9 10 11 12
+Define A 7

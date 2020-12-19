@@ -75,6 +75,14 @@ def RegAddressingModes(operand_name):
   else:
     return "000"
 
+def IsBranch(name):
+  branches = ["BR","BEQ","ENE","BLO","BLS","BHI","BHS"]
+  flag = False
+  for branch in branches:
+    if branch in name:
+      flag = True
+  return flag
+
 def OperationHandling(name,string_arr):
   '''
   1- Take the operation name and the operands array
@@ -101,7 +109,7 @@ def OperationHandling(name,string_arr):
             instruction.AddOperand(reg)
             reg_flag = True
             break
-        if not reg_flag:
+        if not reg_flag and not IsBranch(name):
           instruction.AddOperand(operand)
           words_count+=1
           instruction.AddAddressingMode(PCAddressingModes(operand))
