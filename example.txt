@@ -1,7 +1,7 @@
 ;this code doesn’t do anything significant, it is just an example 0
-MOV N, R0 ; R0 = 7 address 0
+MOV @N, R0 ; R0 = 7 address 0
 XOR R1, R1 ; R1 = 0 address 2
-MOV #20, R3 ; R3 = 20 address 3
+MOV @#20, R3 ; R3 = 20 address 3
 ; memory is word addressable, so there isno 3
 ; problem in having odd addresses, why? 3
 Label3: ; address 5
