@@ -6,6 +6,7 @@ class Operation:
     self.name=name
     self.operands=[]
     self.modes=[]
+    self.x = []
 
   def AddOperand(self,op):
     '''
@@ -19,21 +20,28 @@ class Operation:
     '''
     self.modes.append(mode)
 
+  def AddX(self,x):
+    '''
+    Save the index for the index addressing mode
+    '''
+    self.x.append(x)
+
 
 def PCAddressingModes(operand_name):
   '''
   Take the operand and return it's addressing mode's binary code
   For PC addressing mode
   '''
-  #Absolute
+  #Absolute (autoincrement indirect)
   if '#' in operand_name and '@' in operand_name:
     return "101"
-  #Immediate
+  #Immediate (autoincrement)
   elif '#' in operand_name:
     return "001"
-  #Relative indirect
+  #Relative indirect (index indirect)
   elif '@' in operand_name:
     return "111"
+  #Index
   else:
     return "011"
 
@@ -43,44 +51,62 @@ def RegAddressingModes(operand_name):
   Take the operand and return it's addressing mode's binary code
   For Register addressing mode
   '''
-  # Autoincrement indirect
+  # Autoincrement indirect @(R)+
   if '@' in operand_name and '+' in operand_name:
     return "101"
 
-  #Autoincrement direct
+  #Autoincrement direct (R)+
   elif '+' in operand_name:
     return "001"
 
-  #Autodecrement indirect
+  #Autodecrement indirect @-(R)
   elif '@' in operand_name and '-' in operand_name:
     return "110"
 
-  #Autodecrement direct
+  #Autodecrement direct  -(R)
   elif '-' in operand_name:
     return "010"
 
-  #Index indirect
+  #Index indirect @x(R)
   elif '@' in operand_name and '+' not in operand_name and '-' not in operand_name and '(' in operand_name:
     return "111"
 
-  #Index direct
+  #Index direct  x(R)
   elif '+' not in operand_name and '-' not in operand_name and '(' in operand_name:
     return "011"
 
-  #Register indirect
+  #Register indirect @R
   elif '@' in operand_name:
     return '100'
 
-  #Register direct
+  #Register direct R
   else:
     return "000"
 
 def IsBranch(name):
+  '''
+  Input: instruction name
+  Output: Flag indicating if the instruction is branch instruction
+  '''
   branches = ["BR","BEQ","ENE","BLO","BLS","BHI","BHS"]
   flag = False
   for branch in branches:
     if branch in name:
       flag = True
+      break
+  return flag
+
+def IsRegister(name):
+  '''
+  Input: operand name
+  Output: Flag indicating if the operand is register
+  '''
+  registers = ["R0","R1","R2","R3","R4","R5","R6","R7"]
+  flag = False
+  for register in registers:
+    if register in name:
+      flag = True
+      break
   return flag
 
 def OperationHandling(name,string_arr):
@@ -88,33 +114,62 @@ def OperationHandling(name,string_arr):
   1- Take the operation name and the operands array
   2- Check if it is a label return it and 0
   3- for each operand if it not one of the register increment the count
+  4- Specify addressing modes
+  5- Extract the operands
+  6- For Index addressing modes increment the words count
 
   It returns class instance of operation contains name , operands , addressing modes returns also the number of words
   '''
+  #Handling label lines
   if ':' in name:
     return (name[:len(name)-1] , 0)
+
+  #Create operation instance
   instruction = Operation(name)
+  #Initilize the count by 1
   words_count = 1
-  registers = ["R0","R1","R2","R3","R4","R5","R6","R7"]
+
+
   for item in string_arr:
-    if item == ';':
+    if item == ';' :
       break
     operands =item.split(',')
 
     for operand in operands:
       if operand != '':
-        reg_flag = False
-        for reg in registers:
-          if reg in operand:
-            instruction.AddOperand(reg)
-            reg_flag = True
-            break
+        reg_flag = IsRegister(operand)
+        #Handling PC addressing modes
         if not reg_flag and not IsBranch(name):
           instruction.AddOperand(operand)
-          words_count+=1
           instruction.AddAddressingMode(PCAddressingModes(operand))
+          words_count+=1
+        #Handling register addressing modes
+        elif reg_flag:
+          R_index = operand.find('R')
+          instruction.AddOperand(operand[R_index:R_index+2])
+          addressing_mode=RegAddressingModes(operand)
+          instruction.AddAddressingMode(addressing_mode)
 
-        else:
-          instruction.AddAddressingMode(RegAddressingModes(operand))
+          #Save x in index addressing modes case
+          #Index addressing mode
+          if addressing_mode == "011":
+            upper_index = operand.find('(')
+            #Extract X
+            binary_x = str(bin(operand[:upper_index]))
+            binary_x = binary_x[2:]
+            binary_x = '0'*(16-len(binary_x)) + binary_x
+            instruction.AddX(binary_x)
+            words_count+=1
+          #Index direct addressing mode
+          if addressing_mode == "111":
+            words_count+=1
+            upper_index = operand.find('(')
+            binary_x = str(bin(int(operand[1:upper_index])))
+            binary_x = binary_x[2:]
+            binary_x = '0'*(16-len(binary_x)) + binary_x
+            instruction.AddX(binary_x)
+        #Handling branch operation it have 1 operands and 0 addressing modes
+        elif IsBranch(name):
+          instruction.AddOperand(operand)
 
   return instruction, words_count

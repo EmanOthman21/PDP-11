@@ -26,6 +26,29 @@ operations = []
 #the index of the current line used in calculating the address
 line_count=0
 
+
+#For PC addressing modes
+def EncodeVarOperand(operand_name):
+  added_next_line = ""
+  # Immedate
+  if operand_name[0] =='#':
+    added_next_line = int(operand_name[1:])
+  # Absolute
+  elif operand_name[0] =='@' and operand_name[1] == '#':
+    added_next_line = int(operand_name[2:])
+  # Relative Indirect
+  elif operand_name[0] =='@':
+    added_next_line = variables[operand_name[1:]]
+  # Relative
+  else:
+    added_next_line = variables[operand_name]
+
+  #Convert to binary string with length =16
+  added_next_line = str(bin(added_next_line))
+  added_next_line = added_next_line[2:]
+  added_next_line = '0'*(16-len(added_next_line)) + added_next_line
+  return added_next_line
+
 # Registers dictionary
 registers = {
   "R0": "000",
@@ -66,13 +89,18 @@ one_operand_instructions = {
 
 # Branch instructions dictionary
 branch_instructions = {
-  "BR":"110000000",
-  "BEQ":"110000100",
-  "BNE":"110001000",
-  "BL0":"110001100",
-  "BLS":"110010000",
-  "BHI":"110010100",
-  "BHS":"110011000"
+  "BR":"11000000",
+  "BEQ":"11000010",
+  "BNE":"11000100",
+  "BL0":"11000110",
+  "BLS":"11001000",
+  "BHI":"11001010",
+  "BHS":"11001100"
+}
+
+# No operands dictionary
+no_operands_instructions = {
+  "HLT": "1110000000000000"
 }
 
 #loop over the lines
@@ -87,13 +115,17 @@ for line in lines:
 
   #Split the line into words
   words = line.split()
-  
+
+  #ignoring NOP instruction
+  if words[0] =="NOP":
+    starting_address.append(starting_address[line_count-1])
+    continue
+
   #Handle operations other than define
   if words[0] != 'Define':
     operation_instance , num_words = OperationHandling(words[0],words[1:])
     if num_words == 0:
       labels[operation_instance]=starting_address[line_count-1]
-      #labels.append(operation_instance)
     else:
       operations.append(operation_instance)
     starting_address.append(num_words+starting_address[line_count-1])
@@ -102,32 +134,86 @@ for line in lines:
   if words[0] == 'Define':
     define_instance = DefineHandling(words[1],words[2:],starting_address[line_count-1])
     define_arr.append(define_instance)
-    variables[define_instance.name] = define_instance.values[0]
+    variables[define_instance.name] = define_instance.address
     starting_address.append(define_instance.size+starting_address[line_count-1])
-
 
 # Write the output file:
 output_file = open('output.txt','w')
 for operation in operations:
+  #List of extra words to be printed
+  out_line = []
+  #Index to the x in the index addressing modes to know what x in the list to be accessed
+  x_index=0
+
+  #Handling two operand instructions
   if len(operation.operands) == 2:
+    #Out the operation opcode
     output_file.write(two_operands_instructions[operation.name])
-    added_next_line= ""
+    #Handling operation operands
     for i in range(2):
       output_file.write(operation.modes[i])
+      #Handling operands
+      #Case1: operand is a register
       if operation.operands[i] in registers:
         output_file.write(registers[operation.operands[i]])
+        #Extract (x)s of index addressing modes and add them to the list to be printed
+        if operation.modes[i]=="011" or operation.modes[i] =="111":
+          out_line.append(operation.x[x_index])
+          x_index+=1
+      #Case2: operand is not a register (PC addressing modes)
       else:
         output_file.write("111")
-        if operation.operands[i][0] =='#':
-          added_next_line = int(operation.operands[i][1:])
-        elif operation.operands[i][0] =='@' and operation.operands[i][1] == '#':
-          added_next_line = int(operation.operands[i][2:])
-        elif operation.operands[i][0] =='@':
-          added_next_line = variables[operation.operands[i][1:]]
-        else:
-          added_next_line = variables[operation.operands[i]]
+        out_line.append(EncodeVarOperand(operation.operands[i]))
+
     output_file.write("\n")
-    if added_next_line != "":
-      binary_value = str(bin(added_next_line))
-      output_file.write(binary_value[2:])
+    for x_value in out_line:
+      output_file.write(x_value)
       output_file.write("\n")
+
+  #Handling one branch instructions
+  elif len(operation.operands) == 1 and IsBranch(operation.name):
+    #out instruction opcode
+    output_file.write(branch_instructions[operation.name])
+    #out the offset => binary string with length =8
+    binary_value = str(bin(labels[operation.operands[0]]))
+    binary_value = binary_value[2:]
+    binary_value = '0'*(8-len(binary_value)) + binary_value
+    output_file.write(binary_value)
+    output_file.write("\n")
+
+  #Handling one operand instruction
+  elif len(operation.operands) == 1:
+    #out the operation opcode
+    output_file.write(one_operand_instructions[operation.name])
+    #out the addressing mode
+    output_file.write(operation.modes[0])
+    if operation.operands[0] in registers:
+      output_file.write(registers[operation.operands[0]])
+      if operation.modes[0] == "011" or operation.modes[0] == "111":
+        out_line.append(operation.x[x_index])
+    else:
+      output_file.write("111")
+      out_line.append(EncodeVarOperand(operation.operands[0]))
+
+    output_file.write("\n")
+    for x_value in out_line:
+      output_file.write(x_value)
+      output_file.write("\n")
+
+  elif len(operation.operands) == 0:
+    output_file.write(no_operands_instructions[operation.name])
+    output_file.write("\n")
+
+#Handling defines
+for define in define_arr:
+  for val in define.values:
+    binary_value=str(bin(val))
+    binary_value = binary_value[2:]
+    binary_value = '0'*(16-len(binary_value)) + binary_value
+    output_file.write(binary_value)
+    output_file.write("\n")
+
+# for defk in define_arr:
+#   print(defk.address)
+
+# print(labels)
