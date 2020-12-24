@@ -1,5 +1,5 @@
-from DefineHandler import *
-from OperationHandler import *
+from DefineHandler import DefineHandling
+from OperationHandler import OperationHandling, IsBranch
 
 
 #Read the program line by line
@@ -83,7 +83,7 @@ one_operand_instructions = {
   "LSR":"1101010000",
   "ROR":"1101010100",
   "ASR":"1101011000",
-  "LSR":"1101011100",
+  "LSL":"1101011100",
   "ROL":"1101100000"
 }
 
@@ -212,8 +212,3 @@ for define in define_arr:
     binary_value = '0'*(16-len(binary_value)) + binary_value
     output_file.write(binary_value)
     output_file.write("\n")
-
-# for defk in define_arr:
-#   print(defk.address)
-
-# print(labels)
