@@ -1,11 +1,45 @@
 from DefineHandler import DefineHandling
 from OperationHandler import OperationHandling, IsBranch
 
+#For PC addressing modes
+def EncodeVarOperand(operand_name,line_num=0):
+  '''
+  This function to extract the operands from the operand name and return it
+  Ex: #18 => 18
+      Var => Var_address - line_num(PC) - 2
+  '''
+  added_next_line = ""
+  # Immedate
+  if operand_name[0] =='#':
+    added_next_line = int(operand_name[1:])
+    line_num = 0
+  # Absolute
+  elif operand_name[0] =='@' and operand_name[1] == '#':
+    added_next_line = int(operand_name[2:])
+    line_num = 0
+  # Relative Indirect
+  elif operand_name[0] =='@':
+    line_num +=2
+    added_next_line = variables[operand_name[1:]]
+  # Relative
+  else:
+    line_num +=2
+    added_next_line = variables[operand_name]
 
-#Read the program line by line
-program_file = open('example.txt','r')
-lines = program_file.readlines()
-program_file.close()
+  return added_next_line - line_num
+
+#Convert signed integers to binary with fixed length
+def ToBinary(num,length):
+  '''
+  Input: 1- Signed integer to be converted
+         2- The output length
+  '''
+  if length == 16:
+    binary_str = bin(num & 0b1111111111111111)[2:]
+  else:
+    binary_str = bin(num & 0b11111111)[2:]
+  binary_str = '0'*(length-len(binary_str))+binary_str
+  return binary_str
 
 # Array of defines data
 define_arr=[]
@@ -25,29 +59,6 @@ operations = []
 
 #the index of the current line used in calculating the address
 line_count=0
-
-
-#For PC addressing modes
-def EncodeVarOperand(operand_name):
-  added_next_line = ""
-  # Immedate
-  if operand_name[0] =='#':
-    added_next_line = int(operand_name[1:])
-  # Absolute
-  elif operand_name[0] =='@' and operand_name[1] == '#':
-    added_next_line = int(operand_name[2:])
-  # Relative Indirect
-  elif operand_name[0] =='@':
-    added_next_line = variables[operand_name[1:]]
-  # Relative
-  else:
-    added_next_line = variables[operand_name]
-
-  #Convert to binary string with length =16
-  added_next_line = str(bin(added_next_line))
-  added_next_line = added_next_line[2:]
-  added_next_line = '0'*(16-len(added_next_line)) + added_next_line
-  return added_next_line
 
 # Registers dictionary
 registers = {
@@ -100,11 +111,20 @@ branch_instructions = {
 
 # No operands dictionary
 no_operands_instructions = {
-  "HLT": "1110000000000000"
+  "HLT":"1110000010000000",
+  "RESET":"1110000000000000"
 }
+
+#Read the program line by line
+program_file = open('example.txt','r')
+lines = program_file.readlines()
+program_file.close()
 
 #loop over the lines
 for line in lines:
+  # Convert all chars to uppercase
+  line = line.upper()
+
   # Increment the count
   line_count+=1
 
@@ -122,7 +142,7 @@ for line in lines:
     continue
 
   #Handle operations other than define
-  if words[0] != 'Define':
+  if words[0] != 'DEFINE':
     operation_instance , num_words = OperationHandling(words[0],words[1:])
     if num_words == 0:
       labels[operation_instance]=starting_address[line_count-1]
@@ -131,12 +151,14 @@ for line in lines:
     starting_address.append(num_words+starting_address[line_count-1])
 
   #Handle define keyword
-  if words[0] == 'Define':
+  if words[0] == 'DEFINE':
     define_instance = DefineHandling(words[1],words[2:],starting_address[line_count-1])
     define_arr.append(define_instance)
     variables[define_instance.name] = define_instance.address
     starting_address.append(define_instance.size+starting_address[line_count-1])
 
+# line_num to simulate the PC value assuming PC starting from 0
+line_num = 0
 # Write the output file:
 output_file = open('output.txt','w')
 for operation in operations:
@@ -158,28 +180,32 @@ for operation in operations:
         output_file.write(registers[operation.operands[i]])
         #Extract (x)s of index addressing modes and add them to the list to be printed
         if operation.modes[i]=="011" or operation.modes[i] =="111":
-          out_line.append(operation.x[x_index])
+          binary_val = ToBinary(operation.x[x_index],16)
+          out_line.append(binary_val)
           x_index+=1
       #Case2: operand is not a register (PC addressing modes)
       else:
         output_file.write("111")
-        out_line.append(EncodeVarOperand(operation.operands[i]))
+        binary_val = ToBinary(EncodeVarOperand(operation.operands[i],line_num+x_index),16)
+        out_line.append(binary_val)
 
     output_file.write("\n")
+    line_num +=1
     for x_value in out_line:
       output_file.write(x_value)
       output_file.write("\n")
+      line_num +=1
+
 
   #Handling one branch instructions
   elif len(operation.operands) == 1 and IsBranch(operation.name):
     #out instruction opcode
     output_file.write(branch_instructions[operation.name])
     #out the offset => binary string with length =8
-    binary_value = str(bin(labels[operation.operands[0]]))
-    binary_value = binary_value[2:]
-    binary_value = '0'*(8-len(binary_value)) + binary_value
+    binary_value = ToBinary(labels[operation.operands[0]]-line_num,8)
     output_file.write(binary_value)
     output_file.write("\n")
+    line_num +=1
 
   #Handling one operand instruction
   elif len(operation.operands) == 1:
@@ -190,25 +216,31 @@ for operation in operations:
     if operation.operands[0] in registers:
       output_file.write(registers[operation.operands[0]])
       if operation.modes[0] == "011" or operation.modes[0] == "111":
-        out_line.append(operation.x[x_index])
+        binary_val = ToBinary(operation.x[x_index],16)
+        out_line.append(binary_val)
     else:
-      output_file.write("111")
-      out_line.append(EncodeVarOperand(operation.operands[0]))
+      binary_val = ToBinary(EncodeVarOperand(operation.operands[i],line_num),16)
+      out_line.append(binary_val)
 
     output_file.write("\n")
+    line_num +=1
     for x_value in out_line:
       output_file.write(x_value)
       output_file.write("\n")
+      line_num +=1
+
 
   elif len(operation.operands) == 0:
     output_file.write(no_operands_instructions[operation.name])
     output_file.write("\n")
+    line_num +=1
 
 #Handling defines
 for define in define_arr:
   for val in define.values:
-    binary_value=str(bin(val))
-    binary_value = binary_value[2:]
-    binary_value = '0'*(16-len(binary_value)) + binary_value
+
+    binary_value= ToBinary(val,16)
     output_file.write(binary_value)
     output_file.write("\n")
+    line_num +=1
+output_file.close()

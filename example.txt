@@ -1,14 +1,14 @@
 ;this code doesn’t do anything significant, it is just an example 0
-MOV @N, @10(R0) ; R0 = 7 address 0
+MOV @10(R0), N ; R0 = 7 address 0    PC + (N address - Line Number - 2)
 XOR R1, R1 ; R1 = 0 address 3
 MOV @#20, R3 ; R3 = 20 address 4
 ; memory is word addressable, so there isno 6
 ; problem in having odd addresses, why? 6
 Label3: ; address 6
-MOV -(R3), M ; M = 5 , R3= 19 address 6
+MOV -(R3), M ; M = 5 , R3= 19 address 6 20-6-2
 DEC R0 ; R0 = 6 address 8
 CMP #18, @R3 ; C=1,N=1 address 9
-BHI Label1 ; Not taken address 11
+BHI Label1 ; Not taken address 11 (label-address - PC) -1
 MOV #18,@R3 ; M=18 address 12
 Label1: ; address 14
 DEC R0 ; R0=5 address 14
@@ -20,4 +20,4 @@ HLT ; address 18
 Define N 7 ; address 19
 Define M 5 ; address 20
 Define arr 7 8 9 10 11 12 ; 21
-Define A 7 ; 27
+Define A -7 ; 27

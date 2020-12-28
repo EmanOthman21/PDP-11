@@ -129,7 +129,6 @@ def OperationHandling(name,string_arr):
   #Initilize the count by 1
   words_count = 1
 
-
   for item in string_arr:
     if item == ';' :
       break
@@ -155,19 +154,13 @@ def OperationHandling(name,string_arr):
           if addressing_mode == "011":
             upper_index = operand.find('(')
             #Extract X
-            binary_x = str(bin(operand[:upper_index]))
-            binary_x = binary_x[2:]
-            binary_x = '0'*(16-len(binary_x)) + binary_x
-            instruction.AddX(binary_x)
+            instruction.AddX(int(operand[:upper_index]))
             words_count+=1
           #Index direct addressing mode
           if addressing_mode == "111":
             words_count+=1
             upper_index = operand.find('(')
-            binary_x = str(bin(int(operand[1:upper_index])))
-            binary_x = binary_x[2:]
-            binary_x = '0'*(16-len(binary_x)) + binary_x
-            instruction.AddX(binary_x)
+            instruction.AddX(int(operand[1:upper_index]))
         #Handling branch operation it have 1 operands and 0 addressing modes
         elif IsBranch(name):
           instruction.AddOperand(operand)
