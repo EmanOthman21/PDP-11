@@ -1,6 +1,6 @@
 ;this code doesn’t do anything significant, it is just an example 0
-MOV @10(R0), N ; R0 = 7 address 0    PC + (N address - Line Number - 2)
-XOR R1, R1 ; R1 = 0 address 3
+MOV @10(R0) , N ;R0 = 7 address 0    PC + (N address - Line Number - 2)
+XOR R1 , R1 ; R1 = 0 address 3
 MOV @#20, R3 ; R3 = 20 address 4
 ; memory is word addressable, so there isno 6
 ; problem in having odd addresses, why? 6

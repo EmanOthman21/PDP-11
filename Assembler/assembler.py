@@ -1,5 +1,6 @@
 from DefineHandler import DefineHandling
 from OperationHandler import OperationHandling, IsBranch
+import sys
 
 #For PC addressing modes
 def EncodeVarOperand(operand_name,line_num=0):
@@ -116,7 +117,7 @@ no_operands_instructions = {
 }
 
 #Read the program line by line
-program_file = open('example.txt','r')
+program_file = open(sys.argv[1],'r')
 lines = program_file.readlines()
 program_file.close()
 
@@ -160,7 +161,7 @@ for line in lines:
 # line_num to simulate the PC value assuming PC starting from 0
 line_num = 0
 # Write the output file:
-output_file = open('output.txt','w')
+output_file = open(sys.argv[2],'w')
 for operation in operations:
   #List of extra words to be printed
   out_line = []

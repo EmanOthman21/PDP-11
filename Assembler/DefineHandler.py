@@ -26,7 +26,7 @@ def DefineHandling(name,string_arr,address):
   '''
   define = DefineClass(name,address)
   for element in string_arr:
-    if element == ';':
+    if element[0] == ';':
       break
     define.AddElement(element)
   return define

@@ -130,7 +130,7 @@ def OperationHandling(name,string_arr):
   words_count = 1
 
   for item in string_arr:
-    if item == ';' :
+    if item[0] == ';' :
       break
     operands =item.split(',')
 
