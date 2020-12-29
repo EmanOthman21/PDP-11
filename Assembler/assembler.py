@@ -166,8 +166,8 @@ for operation in operations:
   #List of extra words to be printed
   out_line = []
   #Index to the x in the index addressing modes to know what x in the list to be accessed
-  x_index=0
-
+  x_index = 0
+  var_index = 0
   #Handling two operand instructions
   if len(operation.operands) == 2:
     #Out the operation opcode
@@ -187,8 +187,10 @@ for operation in operations:
       #Case2: operand is not a register (PC addressing modes)
       else:
         output_file.write("111")
-        binary_val = ToBinary(EncodeVarOperand(operation.operands[i],line_num+x_index),16)
+        binary_val = ToBinary(EncodeVarOperand(operation.operands[i],line_num+var_index),16)
         out_line.append(binary_val)
+      if operation.modes[i] == "011" or operation.modes[i] == "111":
+        var_index +=1
 
     output_file.write("\n")
     line_num +=1
@@ -203,7 +205,7 @@ for operation in operations:
     #out instruction opcode
     output_file.write(branch_instructions[operation.name])
     #out the offset => binary string with length =8
-    binary_value = ToBinary(labels[operation.operands[0]]-line_num,8)
+    binary_value = ToBinary(labels[operation.operands[0]]-line_num-1,8)
     output_file.write(binary_value)
     output_file.write("\n")
     line_num +=1
@@ -220,8 +222,10 @@ for operation in operations:
         binary_val = ToBinary(operation.x[x_index],16)
         out_line.append(binary_val)
     else:
-      binary_val = ToBinary(EncodeVarOperand(operation.operands[i],line_num),16)
+      binary_val = ToBinary(EncodeVarOperand(operation.operands[i],line_num - var_index),16)
       out_line.append(binary_val)
+    if operation.modes[0] == "011" or operation.modes[0] == "111":
+      var_index +=1
 
     output_file.write("\n")
     line_num +=1
@@ -239,7 +243,6 @@ for operation in operations:
 #Handling defines
 for define in define_arr:
   for val in define.values:
-
     binary_value= ToBinary(val,16)
     output_file.write(binary_value)
     output_file.write("\n")
