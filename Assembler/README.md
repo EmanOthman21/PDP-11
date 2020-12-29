@@ -39,8 +39,18 @@ python assembler.py <input_file_path> <output_file_path>
   INC N
   ```
   For indirect addressing modes add '@' before the direct mode syntax
+  
+  ## Some assumptions
 
   ### To use a comment in the same line you should put a space between ';' and the operand
   ```
   MOV R1, R2 ;comment here
+  ```
+  
+  ### The program should not include empty lines
+  
+  ### The Labels' name must be alone in a single line
+  ```
+  Label 1:
+  MOV R1, R2
   ```
