@@ -20,14 +20,11 @@ ARCHITECTURE a_alu OF alu IS
 
   -- Define signals
   Signal FADD, FADC, FSUB, FSBC : std_logic_vector(n-1 DOWNTO 0);
-  Signal FAND, FFOR, FXOR, FCMP : std_logic_vector(n-1 DOWNTO 0);
-  Signal FINC, FDEC, FCLR, FINV : std_logic_vector(n-1 DOWNTO 0);
-  Signal FLSR, FROR, FASR, FINVA : std_logic_vector(n-1 DOWNTO 0);
+  Signal FINC, FDEC, FCMP, FINV : std_logic_vector(n-1 DOWNTO 0);
+  Signal FINVA : std_logic_vector(n-1 DOWNTO 0);
 
   Signal CADD, CADC, CSUB, CSBC : std_logic;
-  Signal CAND, CFOR, CXOR, CCMP : std_logic;
-  Signal CINC, CDEC, CCLR, CINV : std_logic;
-  Signal CLSR, CROR, CASR : std_logic;
+  Signal CINC, CDEC, CINV, CCMP : std_logic;
 
   BEGIN
 
@@ -41,7 +38,6 @@ ARCHITECTURE a_alu OF alu IS
   COMPARATOR: addernbit PORT MAP(B, FINVA, '1', FCMP, CCMP);
   INCREMENTOR: addernbit PORT MAP(B, (others => '0'), '1', FINC, CINC);
   DECREMENTOR: addernbit PORT MAP(B, (others => '1'), '0', FDEC, CDEC);
-  
 
   -- map outputs
     F <= A when selector = "00001"
@@ -56,7 +52,12 @@ ARCHITECTURE a_alu OF alu IS
     else FINC when selector = "01010"
     else FDEC when selector = "01011"
     else (others => '0') when selector = "01100"
-    else FINV when selector = "01101";
+    else FINV when selector = "01101"
+    else '0' & B(n-1 DOWNTO 1) when selector = "01110"
+    else B(0) & B(n-1 DOWNTO 1) when selector = "01111"
+    else B(n-1) & B(n-1 DOWNTO 1) when selector = "10000"
+    else B(n-2 DOWNTO 0) & '0' when selector = "10001"
+    else B(n-2 DOWNTO 0) & B(n-1) when selector = "10010";
 
     cout <= cin when selector = "00001"
     else CADD when selector = "00010"
@@ -64,6 +65,7 @@ ARCHITECTURE a_alu OF alu IS
     else CSUB when selector = "00100" or (selector = "00101" and cin = '0')
     else CSBC when selector = "00101" and cin = '1'
     else '0' when selector = "00110" or selector = "00111" or selector = "01000" or selector = "01100" or selector = "01101"
+      or selector = "01110" or selector = "01111" or selector = "10000" or selector = "10001" or selector = "10010"
     else CCMP when selector = "01001"
     else CINC when selector = "01010"
     else CDEC when selector = "01011";
