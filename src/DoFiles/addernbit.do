@@ -1,4 +1,3 @@
-vsim -gui work.addernbit
 add wave -position insertpoint  \
 sim:/addernbit/carry \
 sim:/addernbit/cin \
