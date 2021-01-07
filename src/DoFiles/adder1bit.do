@@ -1,4 +1,3 @@
-vsim -gui work.adder1bit
 add wave -position insertpoint  \
 sim:/adder1bit/a \
 sim:/adder1bit/b \
