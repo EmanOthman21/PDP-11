@@ -21,23 +21,37 @@ ARCHITECTURE a_alu OF alu IS
   -- Define signals
   Signal FADD, FADC, FSUB, FSBC : std_logic_vector(n-1 DOWNTO 0);
   Signal FINC, FDEC, FCMP, FINV : std_logic_vector(n-1 DOWNTO 0);
-  Signal FINVA : std_logic_vector(n-1 DOWNTO 0);
+  Signal FINVA, NEGB, NEGA, ONE : std_logic_vector(n-1 DOWNTO 0);
+  Signal NEGBMIN : std_logic_vector(n-1 DOWNTO 0);
 
-  Signal CADD, CADC, CSUB, CSBC : std_logic;
-  Signal CINC, CDEC, CINV, CCMP : std_logic;
+  Signal CADD, CADC, CSUB, CSBC , CA: std_logic;
+  Signal CINC, CDEC, CINV, CCMP, CB , CNEGB : std_logic;
 
   BEGIN
 
   -- logic
   FINV <= not B;
   FINVA <= not A;
-  ADDER: addernbit PORT MAP(A, B, '0', FADD, CADD);
-  ADDERCARRAY: addernbit PORT MAP(A, B, CIN, FADC, CADC);
-  SUBBTRACTOR: addernbit PORT MAP(A, FINV, '1', FSUB, CSUB);
-  SUBBCARRY: addernbit PORT MAP(A, FINV, '0', FSBC, CSBC);
-  COMPARATOR: addernbit PORT MAP(B, FINVA, '1', FCMP, CCMP);
-  INCREMENTOR: addernbit PORT MAP(B, (others => '0'), '1', FINC, CINC);
-  DECREMENTOR: addernbit PORT MAP(B, (others => '1'), '0', FDEC, CDEC);
+  ONE <= "0000000000000001";
+  NegBAdder : addernbit GENERIC MAP (16) port map (FINV, ONE, '0', NEGB, CB);
+  NegAAdder : addernbit GENERIC MAP (16) port map (FINVA, ONE, '0', NEGA, CA);
+
+  -- A + B
+  ADDER: addernbit GENERIC MAP (16) PORT MAP(A, B, '0', FADD, CADD);
+  -- A + B + carry
+  ADDERCARRY: addernbit GENERIC MAP (16) PORT MAP(A, B, CIN, FADC, CADC);
+  -- A - B = A + (-B)
+  SUBBTRACTOR: addernbit GENERIC MAP (16) PORT MAP(A, NEGB, '0', FSUB, CSUB);
+  -- -B - 1
+  DECNEGB: addernbit GENERIC MAP (16) PORT MAP(NEGB, (others => '1'), '0', NEGBMIN, CNEGB);
+  -- A - B -1 = A + (-B - 1)
+  SUBBCARRY: addernbit GENERIC MAP (16) PORT MAP(A, NEGBMIN, '0', FSBC, CSBC);
+  -- B - A = B + (-A)
+  COMPARATOR: addernbit GENERIC MAP (16) PORT MAP(B, NEGA, '0', FCMP, CCMP);
+  -- B + 1
+  INCREMENTOR: addernbit GENERIC MAP (16) PORT MAP(B, (others => '0'), '1', FINC, CINC);
+  -- B - 1 = B + (-1)
+  DECREMENTOR: addernbit GENERIC MAP (16) PORT MAP(B, (others => '1'), '0', FDEC, CDEC);
 
   -- map outputs
     F <= A when selector = "00001"
@@ -64,9 +78,9 @@ ARCHITECTURE a_alu OF alu IS
     else CADC when selector = "00011"
     else CSUB when selector = "00100" or (selector = "00101" and cin = '0')
     else CSBC when selector = "00101" and cin = '1'
-    else '0' when selector = "00110" or selector = "00111" or selector = "01000" or selector = "01100" or selector = "01101"
-      or selector = "01110" or selector = "01111" or selector = "10000" or selector = "10001" or selector = "10010"
     else CCMP when selector = "01001"
     else CINC when selector = "01010"
-    else CDEC when selector = "01011";
+    else CDEC when selector = "01011"
+    else '0';
+
 END a_alu;
