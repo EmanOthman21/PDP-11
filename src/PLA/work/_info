@@ -1,0 +1,205 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/Modeltech_pe_edu_10.4a/examples
+Eencoder
+Z0 w1610612256
+Z1 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
+Z2 DPx4 ieee 14 std_logic_1164 0 22 eNV`TJ_GofJTzYa?f<@Oe1
+Z3 dF:/PDP-11/src/PLA
+Z4 8F:\PDP-11\src\PLA\encoder.vhd
+Z5 FF:\PDP-11\src\PLA\encoder.vhd
+l0
+L4
+V1eCZ56;3WOF;`U<0[K7HL3
+!s100 3QT0:zMXYW@dgGZ?7lIn>2
+Z6 OP;C;10.4a;61
+32
+Z7 !s110 1610630950
+!i10b 1
+Z8 !s108 1610630950.000000
+Z9 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|F:\PDP-11\src\PLA\encoder.vhd|
+Z10 !s107 F:\PDP-11\src\PLA\encoder.vhd|
+!i113 1
+Z11 o-work work -2002 -explicit -O0
+Z12 tExplicit 1
+Aencoderarch
+R1
+R2
+DEx4 work 7 encoder 0 22 1eCZ56;3WOF;`U<0[K7HL3
+l12
+L11
+VfmRz;4L0OnY_QcY=e1fi:3
+!s100 RkV`=N]0_8Gzk6D@]cY:b1
+R6
+32
+R7
+!i10b 1
+R8
+R9
+R10
+!i113 1
+R11
+R12
+Emux1
+Z13 w1610622943
+R1
+R2
+R3
+Z14 8F:\PDP-11\src\PLA\mux1.vhd
+Z15 FF:\PDP-11\src\PLA\mux1.vhd
+l0
+L4
+Vm8z=8>hlOh7C:ijN7S_OF1
+!s100 [NBcZBL]SNF?OY6`l>9Of2
+R6
+32
+R7
+!i10b 1
+R8
+Z16 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|F:\PDP-11\src\PLA\mux1.vhd|
+Z17 !s107 F:\PDP-11\src\PLA\mux1.vhd|
+!i113 1
+R11
+R12
+Amux1arch
+R1
+R2
+DEx4 work 4 mux1 0 22 m8z=8>hlOh7C:ijN7S_OF1
+l15
+L14
+VTnehOMn9iD_z5f6L[T4>00
+!s100 9iU3OW7cRB0dC[CNJk=Vi3
+R6
+32
+R7
+!i10b 1
+R8
+R16
+R17
+!i113 1
+R11
+R12
+Emux2
+Z18 w1610630440
+R1
+R2
+R3
+Z19 8F:\PDP-11\src\PLA\mux2.vhd
+Z20 FF:\PDP-11\src\PLA\mux2.vhd
+l0
+L4
+V:g[WRTc1aASYni3@POPH02
+!s100 D0SAQ=zO^H84bAHCNnWTK1
+R6
+32
+Z21 !s110 1610630951
+!i10b 1
+Z22 !s108 1610630951.000000
+Z23 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|F:\PDP-11\src\PLA\mux2.vhd|
+Z24 !s107 F:\PDP-11\src\PLA\mux2.vhd|
+!i113 1
+R11
+R12
+Amux2arch
+R1
+R2
+DEx4 work 4 mux2 0 22 :g[WRTc1aASYni3@POPH02
+l14
+L13
+Vn^;ZTDb?=b4iag_<RE1SX3
+!s100 IFiP]GP;CjcCzXJ]dgRBL3
+R6
+32
+R21
+!i10b 1
+R22
+R23
+R24
+!i113 1
+R11
+R12
+Emux3
+Z25 w1610621321
+R1
+R2
+R3
+Z26 8F:\PDP-11\src\PLA\mux3.vhd
+Z27 FF:\PDP-11\src\PLA\mux3.vhd
+l0
+L4
+VO7;S8;8odk^Ml]S:[4N3b3
+!s100 T8NLZZ?lL1I>Gn]^9f68U2
+R6
+32
+R21
+!i10b 1
+R22
+Z28 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|F:\PDP-11\src\PLA\mux3.vhd|
+Z29 !s107 F:\PDP-11\src\PLA\mux3.vhd|
+!i113 1
+R11
+R12
+Amux3arch
+R1
+R2
+DEx4 work 4 mux3 0 22 O7;S8;8odk^Ml]S:[4N3b3
+l13
+L12
+VihNUDG4B:eo7J3b>zBb2n3
+!s100 jGLDjm3E7h1nGOc96gKH92
+R6
+32
+R21
+!i10b 1
+R22
+R28
+R29
+!i113 1
+R11
+R12
+Epla
+Z30 w1610631192
+R1
+R2
+R3
+Z31 8F:\PDP-11\src\PLA\PLA.vhd
+Z32 FF:\PDP-11\src\PLA\PLA.vhd
+l0
+L4
+VnUSO58z?]F`Q^P6fnBV=02
+!s100 jlP?ILao8QlRSVI`9b01F2
+R6
+32
+Z33 !s110 1610631197
+!i10b 1
+Z34 !s108 1610631197.000000
+Z35 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|F:\PDP-11\src\PLA\PLA.vhd|
+Z36 !s107 F:\PDP-11\src\PLA\PLA.vhd|
+!i113 1
+R11
+R12
+Aplaarch
+R1
+R2
+DEx4 work 3 pla 0 22 nUSO58z?]F`Q^P6fnBV=02
+l51
+L14
+V5LbM=FlSWV`oBI1Q`86oP3
+!s100 39h4:QN6n9006D57][_n90
+R6
+32
+R33
+!i10b 1
+R34
+R35
+R36
+!i113 1
+R11
+R12
