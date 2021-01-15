@@ -1,0 +1,127 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/Users/lenovo/Desktop/arch_project
+Edecoder
+Z0 w1610638617
+Z1 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
+Z2 DPx4 ieee 14 std_logic_1164 0 22 eNV`TJ_GofJTzYa?f<@Oe1
+Z3 dC:/Users/lenovo/Desktop/Arch_Project__
+Z4 8C:/Users/lenovo/Desktop/Arch_Project__/InSignals.vhdl
+Z5 FC:/Users/lenovo/Desktop/Arch_Project__/InSignals.vhdl
+l0
+L4
+V1_I>kgT<A`A0j:Ob;FE>S3
+!s100 RYQJ::DRn0m3ROczc8[Ie1
+Z6 OV;C;10.5b;63
+32
+Z7 !s110 1610639518
+!i10b 1
+Z8 !s108 1610639518.000000
+Z9 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/lenovo/Desktop/Arch_Project__/InSignals.vhdl|
+Z10 !s107 C:/Users/lenovo/Desktop/Arch_Project__/InSignals.vhdl|
+!i113 1
+Z11 o-work work -2002 -explicit
+Z12 tExplicit 1 CvgOpt 0
+Aadecoder
+R1
+R2
+DEx4 work 7 decoder 0 22 1_I>kgT<A`A0j:Ob;FE>S3
+l13
+L12
+VU`k?V33U?Ge0:;e6_P:l@2
+!s100 ^3=RPTB;z`gXKaF_^ebcA1
+R6
+32
+R7
+!i10b 1
+R8
+R9
+R10
+!i113 1
+R11
+R12
+Ein_decoder
+Z13 w1610639661
+R1
+R2
+R3
+R4
+R5
+l0
+L4
+V]>RolE_X7AV<SbTcD4C_I0
+!s100 IVG^7;j8[fW?>JoL^]Z;K3
+R6
+32
+Z14 !s110 1610639666
+!i10b 1
+Z15 !s108 1610639666.000000
+R9
+R10
+!i113 1
+R11
+R12
+Aain_decoder
+R1
+R2
+DEx4 work 10 in_decoder 0 22 ]>RolE_X7AV<SbTcD4C_I0
+l12
+L11
+VA5RIGDg^lk;;PHMZG`MON3
+!s100 ZomN<NRNM>d@ag_UEWnHW1
+R6
+32
+R14
+!i10b 1
+R15
+R9
+R10
+!i113 1
+R11
+R12
+Eout_decoder
+Z16 w1610640846
+R1
+R2
+R3
+Z17 8C:/Users/lenovo/Desktop/Arch_Project__/OutSignals.vhdl
+Z18 FC:/Users/lenovo/Desktop/Arch_Project__/OutSignals.vhdl
+l0
+L4
+VP49lMKA`7l0SITB>U:aF52
+!s100 1_n=<ZSjn9EQ7aMFC7[K82
+R6
+32
+Z19 !s110 1610640852
+!i10b 1
+Z20 !s108 1610640852.000000
+Z21 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/lenovo/Desktop/Arch_Project__/OutSignals.vhdl|
+Z22 !s107 C:/Users/lenovo/Desktop/Arch_Project__/OutSignals.vhdl|
+!i113 1
+R11
+R12
+Aaout_decoder
+R1
+R2
+DEx4 work 11 out_decoder 0 22 P49lMKA`7l0SITB>U:aF52
+l12
+L11
+Vc=_J=HRGELWAD_XY8hYKz2
+!s100 :?4kaPc^YjB6W3Zl0AYk41
+R6
+32
+R19
+!i10b 1
+R20
+R21
+R22
+!i113 1
+R11
+R12
