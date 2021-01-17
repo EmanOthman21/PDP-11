@@ -11,8 +11,7 @@ n : integer := 16
 		clk : IN std_logic;
 		MAR : INOUT  std_logic_vector(10 DOWNTO 0);
 		MDR : INOUT  std_logic_vector(n-1 DOWNTO 0);
-		ReadWriteSignals:IN std_logic_vector(1 DOWNTO 0);
-		WFMC :IN std_logic);
+		ReadWriteSignals:IN std_logic_vector(1 DOWNTO 0););
 END ENTITY ram_Entity;
 
 ARCHITECTURE RAM_Memory OF ram_Entity IS
