@@ -73,14 +73,13 @@ ARCHITECTURE a_alu OF alu IS
     else B(n-2 DOWNTO 0) & '0' when selector = "10001"
     else B(n-2 DOWNTO 0) & B(n-1) when selector = "10010";
 
-    cout <= cin when selector = "00001"
-    else CADD when selector = "00010"
+    cout <= CADD when selector = "00010"
     else CADC when selector = "00011"
     else CSUB when selector = "00100" or (selector = "00101" and cin = '0')
     else CSBC when selector = "00101" and cin = '1'
     else CCMP when selector = "01001"
     else CINC when selector = "01010"
     else CDEC when selector = "01011"
-    else '0';
+    else cin;
 
 END a_alu;
