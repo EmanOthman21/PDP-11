@@ -16,49 +16,38 @@ architecture aRegester_Enabls of Regester_Enabls is
 
  COMPONENT decoder 
   port(
-  ENABLE1 : in STD_LOGIC;
-  ENABLE2 : in STD_LOGIC;
-  selection : in STD_LOGIC_VECTOR(2 downto 0);
+  selection: in std_logic_vector(2 downto 0);
+  ENABLEIN : in STD_LOGIC;
+  ENABLEOUT : in STD_LOGIC;
   outEnable_decoder : out STD_LOGIC_VECTOR(7 downto 0);
   inEnable_decoder : out STD_LOGIC_VECTOR(7 downto 0)
    );
  END COMPONENT;
 
-signal RegIn,RegOut:std_logic ;
+signal SrcOut,DestOut,SrcIn,DestIn:std_logic ;
 signal IRscr,IRdest:std_logic_vector (2 downto 0);
 signal outsourcedecoder,outdestdecoder,insourcedecoder,indestdecoder:std_logic_vector (7 downto 0);
 
 begin
+  SrcOut <= '1' when OUT_selectors = "0001"
+  else '0';
 
-PROCESS(IN_selectors,OUT_selectors)
-BEGIN
+  DestOut <= '1' when OUT_selectors = "0010"
+  else '0';
 
-IF(OUT_selectors = "0001" or OUT_selectors = "0010" ) THEN
-RegOut <=  '1' ;
-ELSE
-RegOut <=  '0' ;
-END IF;
+  SrcIn <= '1' when IN_selectors = "001"
+  else '0';
 
-IF(IN_selectors = "001" or IN_selectors = "010") THEN
-RegIn <=  '1' ;
-ELSE
-RegIn <=  '0' ;
-END IF;
+  DestIn <= '1' when IN_selectors = "010"
+  else '0';
 
-IF(OUT_selectors = "0001" or IN_selectors = "001" ) THEN
-IRscr <= IR(8 downto 6);
-END IF;
+  IRscr <= IR(8 downto 6) when OUT_selectors = "0001" or IN_selectors = "001";
+  IRdest <= IR(2 downto 0) when OUT_selectors = "0010" or IN_selectors = "010";
 
-IF(OUT_selectors = "0010" or IN_selectors = "010" ) THEN
-IRdest <= IR(2 downto 0);
-END IF;
+  -- Reg , IN/OUT , Enable register if in , Enable tristate if out
+RegSourceEnable: decoder PORT MAP(IRscr,SrcIn,SrcOut,outsourcedecoder,insourcedecoder);
+RegDestEnable: decoder PORT MAP(IRdest,DestIn,DestOut,outdestdecoder,indestdecoder);
 
-
-END PROCESS;
-
-RegSourceDecoder: decoder PORT MAP(RegIn,RegOut ,IRscr, outsourcedecoder , insourcedecoder );
-RegDestDecoder : decoder PORT MAP(RegIn,RegOut ,IRdest,outdestdecoder,indestdecoder);
 IN_Enable<=insourcedecoder or indestdecoder ;
 out_Enable<=outdestdecoder or outsourcedecoder;
-
 end aRegester_Enabls;
