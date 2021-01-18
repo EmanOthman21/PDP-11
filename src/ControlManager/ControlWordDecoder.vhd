@@ -123,6 +123,10 @@ END COMPONENT;
 	Signal changeFlagEnable:std_logic;
 	Signal IROUT :std_logic_vector(15 DOWNTO 0);
 	Signal rst : std_logic;
+	Signal Xin : std_logic_vector(15 DOWNTO 0);
+	Signal Yin : std_logic_vector(15 DOWNTO 0);
+	Signal Carry_IN : std_logic;
+
 	-- Processor Data Bus --
 	
 
@@ -173,7 +177,13 @@ registerPC:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(0),clk,rst,DataBus,PC);
 
 	
 	-- ALU -- MSB:CARRY-ZERO-NEG -ALUOUT SHOULB BE DATA FOR Z_IN
-	ALUComponent : alu GENERIC MAP (16) port map (X,Y,ALUselector,FlagRegister(2),ALUOUT,Carry);
+	Xin <= DataBus WHEN ControlWord(0) ='1'
+	ELSE X;
+	Yin <= "0000000000000000" WHEN ControlWord(5) ='1'
+	ELSE Y;
+	Carry_IN <= '1' WHEN ControlWord(5) ='1'
+	ELSE FlagRegister(2);
+	ALUComponent : alu GENERIC MAP (16) port map (Xin,Yin,ALUselector,Carry_IN,ALUOUT,Carry);
 
 	-- Flag Change
 	changeFlagEnable<=OperationType(2) or OperationType(3) ;
