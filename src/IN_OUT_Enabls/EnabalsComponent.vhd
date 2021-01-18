@@ -59,6 +59,8 @@ IN_Enabals(6 downto 4) <=  "010" ;
 
 ELSIF(CW_IN_selectors(5 downto 3) = "101")THEN
 IN_Enabals(6 downto 4) <=  "001" ;
+ELSE
+IN_Enabals(6 downto 4) <=  "000" ;
 END IF;
 
 
@@ -72,19 +74,21 @@ ELSIF(CW_OUT_selectors = "0100")THEN
 OUT_Enabals(6 downto 0) <=  "0100000" ;
 
 ELSIF(CW_OUT_selectors = "0101")THEN
-OUT_Enabals(6 downto 0) <=  "0010000" ;
-
-ELSIF(CW_OUT_selectors = "0110")THEN
 OUT_Enabals(6 downto 0) <=  "0001000" ;
 
-ELSIF(CW_OUT_selectors = "0111")THEN
+ELSIF(CW_OUT_selectors = "0110")THEN
 OUT_Enabals(6 downto 0) <=  "0000100" ;
+
+ELSIF(CW_OUT_selectors = "0111")THEN
+OUT_Enabals(6 downto 0) <=  "0010000" ;
 
 ELSIF(CW_OUT_selectors = "1000")THEN
 OUT_Enabals(6 downto 0) <=  "0000010" ;
 
 ELSIF(CW_OUT_selectors = "1001")THEN
 OUT_Enabals(6 downto 0) <=  "0000001" ;
+ELSE
+OUT_Enabals(6 downto 0) <=  "0000000" ;
 
 END IF;
 
