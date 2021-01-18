@@ -88,7 +88,7 @@ def IsBranch(name):
   Input: instruction name
   Output: Flag indicating if the instruction is branch instruction
   '''
-  branches = ["BR","BEQ","ENE","BLO","BLS","BHI","BHS"]
+  branches = ["BR","BEQ","BNE","BLO","BLS","BHI","BHS"]
   flag = False
   for branch in branches:
     if branch in name:
