@@ -10,9 +10,7 @@ n : integer := 26
 	PORT(
 		uPC : INOUT std_logic_vector(8 DOWNTO 0);
 		ControlWord : IN std_logic_vector(n-1 DOWNTO 0);
-		clk : IN std_logic;
-		HLT : INOUT std_logic;
-		RST : INOUT std_logic);
+		clk : IN std_logic);
 END ENTITY ControlWord_Entity;
 
 ARCHITECTURE ControlWordDecoder OF ControlWord_Entity IS
@@ -55,7 +53,6 @@ COMPONENT OperationSignals IS
   ALUSelector: OUT std_logic_vector (4 downto 0));
 END COMPONENT;
 
-
 COMPONENT alu IS
 Generic ( n : Integer:=16);
   PORT (A,B : IN std_logic_vector (n-1 downto 0);
@@ -63,6 +60,13 @@ Generic ( n : Integer:=16);
 	cin: IN std_logic;
 	F: OUT std_logic_vector (n-1 downto 0);
 	cout : OUT std_logic);
+END COMPONENT;
+
+COMPONENT flag IS
+  PORT ( cin, changeEnable: IN std_logic;
+  inFlag: IN std_logic_vector (2 downto 0);
+  F: IN std_logic_vector(15 downto 0);
+	outFlag: OUT std_logic_vector (2 downto 0));
 END COMPONENT;
 
 	-- Registers Signals -- 
@@ -84,6 +88,9 @@ END COMPONENT;
 	Signal OperationType : std_logic_vector(3 DOWNTO 0);
 	Signal ALUselector : std_logic_vector(4 DOWNTO 0);
 	Signal FlagOut:std_logic;
+	Signal Carry:std_logic;
+	Signal ALUOUT: std_logic_vector(15 DOWNTO 0);
+	Signal changeFlagEnable:std_logic;
 	-- Processor Data Bus --
 	
 
@@ -96,17 +103,19 @@ END COMPONENT;
 	OperationSignalsComponent: OperationSignals port map (IR,ControlWord,OperationType,ALUselector);
 
 	-- Branch Flag Test Handler
-	branchFlagComponent: branchFlag port map (OperationType(0),IR(11 DOWNTO 9),FlagRegister(1 DOWNTO 0),FlagOut);
+	branchFlagComponent: branchFlag port map (OperationType(0),IR(11 DOWNTO 9),FlagRegister(2 DOWNTO 1),FlagOut);
 
 	
-	-- ALU SHOULD TAKE LAST 3 BITS FROM uPC TO CHECK IF CHANGE FLAG REG CARRY OR NOT --
-	--ALUComponent : alu GENERIC MAP (16) port map (X,Y,ControlWord(15 downto 11),FlagRegister(0),Z,FlagRegister(0));
+	-- ALU -- MSB:CARRY-ZERO-NEG -ALUOUT SHOULB BE DATA FOR Z_IN
+	ALUComponent : alu GENERIC MAP (16) port map (X,Y,ALUselector,FlagRegister(2),ALUOUT,Carry);
 
-	
+	-- Flag Change
+	changeFlagEnable<=OperationType(2) or OperationType(3) ;
+	FLAGComponent:flag port map (Carry,changeFlagEnable,FlagRegister,ALUOUT,FlagRegister);
 
-	--NEEDS MODIFICATION
+	--PLA NEEDS MODIFICATION FOR uPC INC
 	PLAComponent:PLA port map (OperationType,IR,ControlWord(3 downto 1),FlagOut,uPC);
 
-	-- RAM SHOULD BE CALLED HERE AND TAKES CW (8 DOWNTO 7) FOR READWRITE , MAR(10 DOWNTO 0) ,MDR THEN OUT TO THE MAR,MDR  --
-	RAMComponent : ram_Entity GENERIC MAP (16) port map (RST,RAMCLK,MAR(10 DOWNTO 0),MDR,ControlWord(8 downto 7));
+	-- RAM 
+	RAMComponent : ram_Entity GENERIC MAP (16) port map (ControlWord(9),RAMCLK,MAR(10 DOWNTO 0),MDR,ControlWord(8 downto 7));
 END ControlWordDecoder;
