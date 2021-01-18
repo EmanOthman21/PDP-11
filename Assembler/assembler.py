@@ -112,7 +112,7 @@ branch_instructions = {
 
 # No operands dictionary
 no_operands_instructions = {
-  "HLT":"1110000010000000",
+  "HLT":"1111000000000000",
   "RESET":"1110000000000000"
 }
 
