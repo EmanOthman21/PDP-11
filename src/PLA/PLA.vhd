@@ -7,7 +7,8 @@ ENTITY PLA IS
 	IR: IN std_logic_vector(15 DOWNTO 0);
 	F9: IN std_logic_vector(2 DOWNTO 0);
 	branchCheck: IN std_logic;
-	plaOut: OUT std_logic_vector(8 DOWNTO 0)
+	plaOut: OUT std_logic_vector(8 DOWNTO 0);
+	isHLT:IN std_logic
         );
 END PLA;
 
@@ -72,6 +73,8 @@ BEGIN
  	ELSE out3 WHEN F9 = "010" 
 	--finish ALU write result 
 	ELSE out4 WHEN F9 = "011"
-	ELSE "000000000";
+	--if HLT then stay there
+	ELSE "000000000" WHEN isHLT='0';
+	
 
 END plaArch;
