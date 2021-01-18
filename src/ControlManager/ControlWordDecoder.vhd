@@ -10,7 +10,8 @@ n : integer := 26
 	PORT(
 		uPC : INOUT std_logic_vector(8 DOWNTO 0);
 		ControlWord : IN std_logic_vector(n-1 DOWNTO 0);
-		clk : IN std_logic);
+		clk : IN std_logic;
+		RESET:IN std_logic);
 END ENTITY ControlWord_Entity;
 
 ARCHITECTURE ControlWordDecoder OF ControlWord_Entity IS
@@ -46,9 +47,10 @@ n : integer := 16
 	PORT(
 		rst:IN std_logic;
 		clk : IN std_logic;
-		MAR : INOUT  std_logic_vector(10 DOWNTO 0);
-		MDR : INOUT  std_logic_vector(n-1 DOWNTO 0);
-		ReadWriteSignals:IN std_logic_vector(1 DOWNTO 0));
+		MAR : IN  std_logic_vector(15 DOWNTO 0);
+		DATAIN : IN  std_logic_vector(n-1 DOWNTO 0);
+		ReadWriteSignals:IN std_logic_vector(1 DOWNTO 0);
+		DATAOUT : OUT  std_logic_vector(n-1 DOWNTO 0));
 END component;
 
 component PLA IS
@@ -126,16 +128,24 @@ END COMPONENT;
 	Signal Xin : std_logic_vector(15 DOWNTO 0);
 	Signal Yin : std_logic_vector(15 DOWNTO 0);
 	Signal Carry_IN : std_logic;
-
+	Signal PLAOUT:std_logic_vector(8 DOWNTO 0);
+	Signal RAMIN :std_logic_vector(15 DOWNTO 0);
+	Signal RAMOUT:std_logic_vector(15 DOWNTO 0);
+	Signal CLKREG:std_logic;
+	Signal PCEnableOUT:std_logic;
+	Signal PCEnableIN:std_logic;
+	Signal resetRegisters:std_logic;
 	-- Processor Data Bus --
 	
 
 
 	BEGIN
-
+CLKREG<= not clk;
 	-- Registers Decoders SHOULD BE CALLED HERE For In\OUT And Out the results to the Registers Signals , Should be Called For All Registers AND OUT TO THE DATABUS --
 	EnableRegistersComponent: In_out_Enabls port map (ControlWord(21 DOWNTO 16),ControlWord(25 DOWNTO 22),IR,ENABLEIN,ENABLEOUT);
 rst<=ControlWord(9);
+PCEnableOUT<= ENABLEOUT(7) OR ENABLEOUT(6);
+PCEnableIN<=ENABLEIN(7) OR ENABLEIN(6);
 TRISTATR0:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(14),R0,DataBus);
 TRISTATR1:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(13),R1,DataBus);
 TRISTATR2:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(12),R2,DataBus);
@@ -143,31 +153,33 @@ TRISTATR3:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(11),R3,DataBus);
 TRISTATR4:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(10),R4,DataBus);
 TRISTATR5:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(9),R5,DataBus);
 TRISTATR6:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(8),R6,DataBus);
-TRISTATR7:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(7),R7,DataBus);
-TRISTATMAR:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(6),MAR,DataBus);
-TRISTATMDR:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(5),MDR,DataBus);
-TRISTATX:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(4),X,DataBus);
-TRISTATY:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(3),Y,DataBus);
-TRISTATZ:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(2),Z,DataBus);
+TRISTATMAR:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(0),MAR,DataBus);
+TRISTATMDR:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(1),MDR,DataBus);
+TRISTATX:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(3),X,DataBus);
+TRISTATY:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(2),Y,DataBus);
+TRISTATZ:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(4),Z,DataBus);
 IROUT<="00000000"&IR(7 DOWNTO 0);
-TRISTATIR:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(1),IROUT,DataBus);
-TRISTATPC:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(0),PC,DataBus);
+TRISTATIR:tristate GENERIC MAP (16) PORT MAP(ENABLEOUT(5),IROUT,DataBus);
+TRISTATPC:tristate GENERIC MAP (16) PORT MAP(PCEnableOUT,PC,DataBus);
 
-register0:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(14),clk,rst,DataBus,R0);
-register1:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(13),clk,rst,DataBus,R1);
-register2:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(12),clk,rst,DataBus,R2);
-register3:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(11),clk,rst,DataBus,R3);
-register4:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(10),clk,rst,DataBus,R4);
-register5:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(9),clk,rst,DataBus,R5);
-register6:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(8),clk,rst,DataBus,R6);
-register7:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(7),clk,rst,DataBus,R7);
-registerMAR:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(6),clk,rst,DataBus,MAR);
-registerMDR:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(5),clk,rst,DataBus,MDR);
-registerX:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(4),clk,rst,DataBus,X);
-registerY:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(3),clk,rst,DataBus,Y);
-registerZ:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(2),clk,rst,ALUOUT,Z);
-registerIR:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(1),clk,rst,DataBus,IR);
-registerPC:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(0),clk,rst,DataBus,PC);
+resetRegisters<=rst or RESET;
+
+register0:Reg GENERIC MAP (16) PORT MAP(CLKREG,resetRegisters,ENABLEIN(14),DataBus,R0);
+register1:Reg GENERIC MAP (16) PORT MAP(CLKREG,resetRegisters,ENABLEIN(13),DataBus,R1);
+register2:Reg GENERIC MAP (16) PORT MAP(CLKREG,resetRegisters,ENABLEIN(12),DataBus,R2);
+register3:Reg GENERIC MAP (16) PORT MAP(CLKREG,resetRegisters,ENABLEIN(11),DataBus,R3);
+register4:Reg GENERIC MAP (16) PORT MAP(CLKREG,resetRegisters,ENABLEIN(10),DataBus,R4);
+register5:Reg GENERIC MAP (16) PORT MAP(CLKREG,resetRegisters,ENABLEIN(9),DataBus,R5);
+register6:Reg GENERIC MAP (16) PORT MAP(CLKREG,resetRegisters,ENABLEIN(8),DataBus,R6);
+registerMAR:Reg GENERIC MAP (16) PORT MAP(CLKREG,rst,ENABLEIN(0),DataBus,MAR);
+registerMDR:Reg GENERIC MAP (16) PORT MAP(CLKREG,rst,ENABLEIN(1),DataBus,RAMIN);
+registerX:Reg GENERIC MAP (16) PORT MAP(CLKREG,rst,ENABLEIN(3),DataBus,X);
+registerY:Reg GENERIC MAP (16) PORT MAP(CLKREG,rst,ENABLEIN(2),DataBus,Y);
+registerZ:Reg GENERIC MAP (16) PORT MAP(CLKREG,rst,ENABLEIN(4),ALUOUT,Z);
+registerIR:Reg GENERIC MAP (16) PORT MAP(CLKREG,rst,ENABLEIN(5),DataBus,IR);
+registerPC:Reg GENERIC MAP (16) PORT MAP(CLKREG,resetRegisters,PCEnableIN,DataBus,PC);
+
+
 
 	-- Operation Type Handler	
 	OperationSignalsComponent: OperationSignals port map (IR,ControlWord,OperationType,ALUselector);
@@ -190,9 +202,22 @@ registerPC:Reg GENERIC MAP (n) PORT MAP(ENABLEIN(0),clk,rst,DataBus,PC);
 	FLAGComponent:flag port map (Carry,changeFlagEnable,FlagRegister,ALUOUT,FlagRegister);
 
 	--PLA NEEDS MODIFICATION FOR uPC INC
-	PLAComponent:PLA port map (OperationType,IR,ControlWord(3 downto 1),FlagOut,uPC);
-
+	PLAComponent:PLA port map (OperationType,IR,ControlWord(4 downto 2),FlagOut,PLAOUT);
+	PROCESS(clk) IS  
+		BEGIN
+    		IF rising_edge(clk) THEN  
+			IF  ControlWord(1)='1' AND ControlWord(10)='0' THEN
+				uPC <= PLAOUT;
+			END IF;
+			IF ControlWord(1)='0' AND ControlWord(10)='0' THEN
+          			uPC <= std_logic_vector( unsigned(uPC) + 1 );
+			END IF;
+    		END IF;
+	END PROCESS;
 	-- RAM 
+	
 	RAMCLK<=not clk;
-	RAMComponent : ram_Entity GENERIC MAP (16) port map (rst,RAMCLK,MAR(10 DOWNTO 0),MDR,ControlWord(8 downto 7));
+	RAMComponent : ram_Entity GENERIC MAP (16) port map (rst,RAMCLK,MAR,RAMIN,ControlWord(8 downto 7),RAMOUT);
+	MDR <= RAMOUT WHEN ControlWord(8 DOWNTO 7) ="01"
+	ELSE RAMIN WHEN ControlWord(8 DOWNTO 7) ="10";
 END ControlWordDecoder;

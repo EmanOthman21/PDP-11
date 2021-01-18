@@ -13,7 +13,7 @@ ARCHITECTURE romArch OF rom IS
 	TYPE rom_type IS ARRAY(0 TO 2**9 - 1) of std_logic_vector(25 DOWNTO 0);
 	SIGNAL rom : rom_type := (
 	--Fetch Instruction
-  	0 => "00110001000001100010000001",
+  	0 => "00111011000001100010100001",
   	1 => "01110110000000000001000000",
   	2 => "10001000000000000000000010",
 	--Fetch Src Direct
@@ -124,11 +124,7 @@ ARCHITECTURE romArch OF rom IS
 	449 => "00000000000000010000011110",
   	OTHERS =>"00000000000000000000000000");
 BEGIN
-	PROCESS(clk) IS  
-		BEGIN
-    		IF rising_edge(clk) THEN   
-          		controlWord <= rom(to_integer(unsigned(address)));
-    		END IF;
-	END PROCESS;
-        
+	
+        controlWord <= rom(to_integer(unsigned(address)));
+    	
 END romArch;
