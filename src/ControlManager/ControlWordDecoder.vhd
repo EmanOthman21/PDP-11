@@ -59,7 +59,9 @@ component PLA IS
 	IR: IN std_logic_vector(15 DOWNTO 0);
 	F9: IN std_logic_vector(2 DOWNTO 0);
 	branchCheck: IN std_logic;
-	plaOut: OUT std_logic_vector(8 DOWNTO 0)
+	plaOut: OUT std_logic_vector(8 DOWNTO 0);
+	isHLT:IN std_logic
+	
         );
 END component;
 
@@ -135,6 +137,8 @@ END COMPONENT;
 	Signal PCEnableOUT:std_logic;
 	Signal PCEnableIN:std_logic;
 	Signal resetRegisters:std_logic;
+	Signal ChangeFlagTmp1:std_logic;
+	Signal ChangeFlagTmp2:std_logic;
 	-- Processor Data Bus --
 	
 
@@ -198,11 +202,13 @@ registerPC:Reg GENERIC MAP (16) PORT MAP(CLKREG,resetRegisters,PCEnableIN,DataBu
 	ALUComponent : alu GENERIC MAP (16) port map (Xin,Yin,ALUselector,Carry_IN,ALUOUT,Carry);
 
 	-- Flag Change
-	changeFlagEnable<=OperationType(2) or OperationType(3) ;
+	 ChangeFlagTmp1<=not uPC(8) and uPC(7) and uPC(6)  ;
+	ChangeFlagTmp2<= uPC(8) and not uPC(7) and not uPC(6);
+	changeFlagEnable <= ChangeFlagTmp1 or ChangeFlagTmp2;
 	FLAGComponent:flag port map (Carry,changeFlagEnable,FlagRegister,ALUOUT,FlagRegister);
 
 	--PLA NEEDS MODIFICATION FOR uPC INC
-	PLAComponent:PLA port map (OperationType,IR,ControlWord(4 downto 2),FlagOut,PLAOUT);
+	PLAComponent:PLA port map (OperationType,IR,ControlWord(4 downto 2),FlagOut,PLAOUT, ControlWord(10));
 	PROCESS(clk) IS  
 		BEGIN
     		IF rising_edge(clk) THEN  
