@@ -23,15 +23,11 @@ sim:/controlmanager_entity/ControlWordComponent/DataBus \
 sim:/controlmanager_entity/ControlWordComponent/FlagRegister 
 force -freeze sim:/controlmanager_entity/clk 1 0, 0 {50 ps} -r 100
 force -freeze sim:/controlmanager_entity/uPC 000000000 0
-mem load -i G:/intelFPGA_lite/Arch_PROJECT_FINAL/c1.mem -format binary /controlmanager_entity/ControlWordComponent/RAMComponent/ram
+mem load -i G:/intelFPGA_lite/Arch_PROJECT_FINAL/c5.mem -format binary /controlmanager_entity/ControlWordComponent/RAMComponent/ram
 force -freeze sim:/controlmanager_entity/RESET 1 0
 run
 noforce sim:/controlmanager_entity/uPC
 force -freeze sim:/controlmanager_entity/RESET 0 0
-run
-run
-run
-run
 run
 run
 run
