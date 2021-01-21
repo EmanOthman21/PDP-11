@@ -46,3 +46,7 @@ Simulation to pdp-11 microprocessor with modelsim , The design is a micro-progra
 * Eman Othman
 * Menna Mahmoud
 * Nada Abdelmaboud
+
+## License
+
+[MIT licensed](LICENSE)
