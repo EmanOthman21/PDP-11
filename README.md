@@ -16,7 +16,7 @@ Simulation to pdp-11 microprocessor with modelsim , The design is a micro-progra
 		- MOV,ADD,ADC,SUB,SUBC,AND,OR,XOR,CMP
 	- 1-Operand Instructions:
 		- INC,DEC,CLR,INV,LSR,ROR,ASR,LSL,ROL
-- Branch Instruction
+- Branch Instructions
 	- BR,BEQ,BNE,BLO,BLS,BHI,BHS
 - 0-Operand Instructions
 	- HLT,RST
